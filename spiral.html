@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>music 34 final project</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #f0f0f0;
+				margin: 0px;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+	<body>
+
+    <script src="./js/howler.min.js"></script>
+    <script src="./js/howler.spatial.min.js"></script>
+		<script src="./js/three.min.js"></script>
+		<script src="./js/OrbitControls.js"></script>
+
+		<!-- mine --->
+		<script src="./js/utils.js"></script>
+
+		<script>
+			// https://vimeo.com/97347144
+			var container;
+			var camera, controls, scene, renderer;
+			var objects = [];
+
+			let X = parseInt(getParameterByName('X'));
+			if (isNaN(X)) {
+				X = 600;
+			}
+
+			let Y = parseInt(getParameterByName('Y'));
+			if (isNaN(Y)) {
+				Y = 300;
+			}
+
+			let Z = parseInt(getParameterByName('Z'));
+			if (isNaN(Z)) {
+				Z = 600;
+			}
+
+			let boxSize = parseInt(getParameterByName('Size'));
+			if (isNaN(boxSize)) {
+				boxSize = 20;
+			}
+
+			let numObjects = parseInt(getParameterByName('NumObjects'));
+			if (isNaN(numObjects)) {
+				numObjects = 10;
+			}
+
+			let radius = parseInt(getParameterByName('Radius'));
+			if (isNaN(radius)) {
+				radius = 100;
+			}
+
+			let material = getParameterByName('Material');
+			if (material == null) {
+				material = "wood";
+			}
+
+			init();
+			animate();
+
+			function init() {
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.x = X / 2;
+				camera.position.y = Y / 3;
+				camera.position.z = Z / 2;
+				controls = new THREE.OrbitControls( camera );
+
+				Howler.pos(camera.position.x, camera.position.y , camera.position.z );
+				Howler.orientation(camera.rotation._x, camera.rotation._y, camera.rotation._z);
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xf0f0f0 );
+				scene.add( new THREE.AmbientLight( 0x505050 ) );
+
+				var light = new THREE.SpotLight( 0xffffff, 1.5 );
+				light.position.set( 0, 500, 2000 );
+				light.castShadow = true;
+				light.shadow = new THREE.LightShadow( new THREE.PerspectiveCamera( 50, 1, 200, 10000 ) );
+				light.shadow.bias = - 0.00022;
+				light.shadow.mapSize.width = 2048;
+				light.shadow.mapSize.height = 2048;
+
+				scene.add(light);
+
+				var wallGeometries = createWalls(X, Y, Z)
+
+				for (wall in wallGeometries) {
+					scene.add(wallGeometries[wall]);
+				}
+
+				radius = X / 2;
+				if (Z > X) radius = Z / 2;
+				console.log(radius)
+
+				var path = getSpiral({x: 0, y:0 }, {x:10, y:10}, radius)
+
+				for (var i = 0; i < path.length; i += 10) {
+					 if (material === "wood") {
+
+ 						var box = new THREE.BoxGeometry(boxSize, boxSize, boxSize);
+ 						var sphere = new THREE.SphereGeometry(boxSize/8, boxSize/8, boxSize/8);
+
+ 						var object = new THREE.Mesh( box, new THREE.MeshLambertMaterial( { color: "#966F33"} ) );
+ 						object.position.x =  path[i].x + X/2
+ 						object.position.y = boxSize/2;
+ 						object.position.z = path[i].y + Z/2
+ 						object.castShadow = true;
+ 						object.receiveShadow = true;
+ 						scene.add( object );
+ 						objects.push( object );
+
+ 	          object2 = new THREE.Mesh( sphere, new THREE.MeshLambertMaterial( { color: "white"} ) );
+ 						object2.position.x = object.position.x;
+ 						object2.position.y = object.position.y + (boxSize * 5 / 8) ;
+ 						object2.position.z = object.position.z;
+ 						object2.castShadow = true;
+ 						object2.receiveShadow = true;
+ 						scene.add( object2 );
+ 						objects.push( object2 );
+
+ 						var sound1 = new Howl({
+ 				    	src: ['./media/' + material + '.mp3'],
+ 							loop: true,
+ 							autoplay: true,
+ 							volume: boxSize / X + boxSize / Y + boxSize / Z ,
+ 							pos: [object2.position.x, object2.position.y, object2.position.z],
+ 							key: [Math.random() * 1000] // random offset
+ 				  	});
+
+ 					}
+ 					else if (material === "metal") {
+
+ 						var rod = new THREE.CylinderGeometry(1, 1, boxSize, 32);
+						var base = new THREE.CylinderGeometry(3, 3, boxSize/20, 32);
+
+ 						var object = new THREE.Mesh( rod, new THREE.MeshLambertMaterial( { color: "gray"} ) );
+ 						object.position.x = path[i].x + X/2
+ 						object.position.y = boxSize/2;
+ 						object.position.z = path[i].y + Z/2
+ 						object.castShadow = true;
+ 						object.receiveShadow = true;
+ 						scene.add( object );
+ 						objects.push( object );
+
+
+						object2 = new THREE.Mesh( base, new THREE.MeshLambertMaterial( { color: "white"} ) );
+						object2.position.x = object.position.x;
+						object2.position.y = object.position.y - 19*boxSize/40;
+						object2.position.z = object.position.z;
+						object2.castShadow = true;
+						object2.receiveShadow = true;
+						scene.add( object2 );
+						objects.push( object2 );
+
+
+ 						vasound1 = new Howl({
+ 				    	src: ['./media/' + material + '.mp3'],
+ 							loop: true,
+ 							autoplay: true,
+ 							volume: 1 / X + boxSize / Y + 1 / Z ,
+ 							pos: [object.position.x, object.position.y, object.position.z],
+ 							key: [Math.random() * 1000] // random offset
+ 				  	});
+ 					}
+
+				}
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.type = THREE.PCFShadowMap;
+				container.appendChild( renderer.domElement );
+				window.addEventListener( 'resize', onWindowResize, false );
+			}
+
+			function onWindowResize() {
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+			}
+
+			function animate() {
+				requestAnimationFrame( animate );
+				render();
+			}
+
+			function render() {
+				controls.update();
+				Howler.pos(camera.position.x, camera.position.y , camera.position.z);
+				Howler.orientation(camera.rotation._x, camera.rotation._y, camera.rotation._z);
+				Howler.volume(1 - Math.sqrt(camera.position.x**2 + camera.position.y**2 + camera.position.z**2) / 5000)
+				renderer.render( scene, camera );
+			}
+
+			// https://stackoverflow.com/questions/33232159/fibonacci-spiral-drawing-in-html5-canvas
+			function getDistance(p1, p2){
+			    return Math.sqrt(Math.pow(p1.x-p2.x, 2) + Math.pow(p1.y-p2.y, 2));
+			};
+
+			function getAngle(p1, p2){
+			    return Math.atan2(p2.y-p1.y, p2.x-p1.x);
+			};
+
+			function FibonacciGenerator() {
+		    var thisFibonacci = this;
+
+		    // Start with 0 1 2... instead of the real sequence 0 1 1 2...
+		    thisFibonacci.array = [0, 1, 2];
+
+		    thisFibonacci.getDiscrete = function(n){
+
+		        // If the Fibonacci number is not in the array, calculate it
+		        while (n >= thisFibonacci.array.length){
+		            var length = thisFibonacci.array.length;
+		            var nextFibonacci = thisFibonacci.array[length - 1] + thisFibonacci.array[length - 2];
+		            thisFibonacci.array.push(nextFibonacci);
+		        }
+
+		        return thisFibonacci.array[n];
+		    };
+
+		    thisFibonacci.getNumber = function(n){
+		        var floor = Math.floor(n);
+		        var ceil = Math.ceil(n);
+
+		        if (Math.floor(n) == n){
+		            return thisFibonacci.getDiscrete(n);
+		        }
+
+		        var a = Math.pow(n - floor, 1.15);
+
+		        var fibFloor = thisFibonacci.getDiscrete(floor);
+		        var fibCeil = thisFibonacci.getDiscrete(ceil);
+
+		        return fibFloor + a * (fibCeil - fibFloor);
+		    };
+
+		    return thisFibonacci;
+			};
+
+			function getSpiral(pA, pB, maxRadius){
+		    // 1 step = 1/4 turn or 90º
+		    var precision = 50; // Lines to draw in each 1/4 turn
+		    var stepB = 4; // Steps to get to point B
+
+		    var angleToPointB = getAngle(pA,pB); // Angle between pA and pB
+		    var distToPointB = getDistance(pA,pB); // Distance between pA and pB
+
+		    var fibonacci = new FibonacciGenerator();
+
+		    // Find scale so that the last point of the curve is at distance to pB
+		    var radiusB = fibonacci.getNumber(stepB);
+		    var scale = distToPointB / radiusB;
+
+		    // Find angle offset so that last point of the curve is at angle to pB
+		    var angleOffset = angleToPointB - stepB * Math.PI / 2;
+
+		    var path = [];
+		    var i, step , radius, angle;
+
+		    // Start at the center
+		    i = step = radius = angle = 0;
+
+		    // Continue drawing until reaching maximum radius
+		    while (radius * scale <= maxRadius){
+
+		        path.push({
+		            x: scale * radius * Math.cos(angle + angleOffset) + pA.x,
+		            y: scale * radius * Math.sin(angle + angleOffset) + pA.y
+		        });
+
+		        i++; // Next point
+		        step = i / precision; // 1/4 turns at point
+		        radius = fibonacci.getNumber(step); // Radius of Fibonacci spiral
+		        angle = step * Math.PI / 2; // Radians at point
+		    }
+		    return path;
+		};
+
+		</script>
+
+	</body>
+</html>

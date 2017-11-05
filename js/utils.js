@@ -4,7 +4,7 @@ function createWalls(x, y, z) {
 
   // floor
   var wallGeometry = new THREE.PlaneGeometry(x, z);
-  var wallMesh = new THREE.Mesh( wallGeometry, new THREE.MeshLambertMaterial( { color: "white"} ));
+  var wallMesh = new THREE.Mesh( wallGeometry, new THREE.MeshLambertMaterial( { color: "#493829"} ));
   wallMesh.rotation.x = -Math.PI / 2;
   wallMesh.position.x = x / 2;
   wallMesh.position.z = z / 2;
@@ -50,5 +50,6 @@ function getParameterByName(name, url) {
         results = regex.exec(url);
     if (!results) return null;
     if (!results[2]) return '';
-    return decodeURIComponent(results[2].replace(/\+/g, " "));
+    var result = decodeURIComponent(results[2].replace(/\+/g, " "));
+    return result.split("?")[0];
 }

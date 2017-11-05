@@ -10,123 +10,128 @@
 				background-color: #f0f0f0;
 				margin: 0px;
 				overflow: hidden;
+				text-align: center;
 			}
+
+			div {
+				padding: 5px;
+			}
+
+			button {
+				margin: 10px
+			}
+
+			.hidden {
+				display: none;
+			}
+
 		</style>
 	</head>
 	<body>
+		<h1>Music 34 Final Project</h1>
 
-    <script src="./js/howler.min.js"></script>
-    <script src="./js/howler.spatial.min.js"></script>
-		<script src="./js/three.min.js"></script>
-		<script src="./js/OrbitControls.js"></script>
+		</div>
+			<button onclick="generateEnvironment()">generate environment</button>
+		</div>
 
-		<!-- mine --->
-		<script src="./js/utils.js"></script>
+		<div>
+			Arrangement:
+			<select onchange="updateOptions()" id="arrangement">
+		    <option value="random">random</option>
+		    <option value="cluster">cluster</option>
+		    <option value="circle">circle</option>
+		    <option value="spiral">fibonacci spiral</option>
+	  	</select>
+		</div>
 
-		<script>
-			// https://vimeo.com/97347144
-			var container;
-			var camera, controls, scene, renderer;
-			var objects = [];
+		<div>
+			Material:
+			<select id="material">
+			<option value="metal">metal rod</option>
+		    <option value="wood">ball on wood</option>
+	  	</select>
+		</div>
 
-			let X = getParameterByName('X');
-			console.log(X)
-			X = 600;
-			let Y = 600;
-			let Z = 600;
-			let boxSize = 40;
-			let numBoxes = 50;
+		<div>
+			Size:
+  		<input id="size" type="number" min="1" max="100" value=50>
+		</div>
 
-			init();
-			animate();
+		<div>
+			X:
+  		<input id="X" type="number" min="100" max="10000" value=500>
+		</div>
+		<div>
+			Y:
+  		<input id="Y" type="number" min="100" max="10000" value=250>
+		</div>
+		<div>
+			Z:
+  		<input id="Z" type="number" min="100" max="10000" value=500>
+		</div>
 
-			function init() {
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
+		<div class="random circle option">
+			Objects:
+  		<input id="objects" type="number" min="1" max="500" value=50>
+		</div>
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.x = X - 100;
-				camera.position.y = Y / 3;
-				camera.position.z = Z - 100;
-				controls = new THREE.OrbitControls( camera );
+		<div class="cluster option hidden">
+			Clusters:
+  		<input id="numClusters" type="number" min="1" max="20" value=5>
+		</div>
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xf0f0f0 );
-				scene.add( new THREE.AmbientLight( 0x505050 ) );
+		<div class="cluster option hidden">
+			Cluster Size:
+  		<input id="clusterSize" type="number" min="1" max="100" value=5>
+		</div>
 
-				var light = new THREE.SpotLight( 0xffffff, 1.5 );
-				light.position.set( 0, 500, 2000 );
-				light.castShadow = true;
-				light.shadow = new THREE.LightShadow( new THREE.PerspectiveCamera( 50, 1, 200, 10000 ) );
-				light.shadow.bias = - 0.00022;
-				light.shadow.mapSize.width = 2048;
-				light.shadow.mapSize.height = 2048;
-
-				scene.add(light);
-
-				var wallGeometries = createWalls(X, Y, Z)
-
-				for (wall in wallGeometries) {
-					scene.add(wallGeometries[wall]);
-				}
-
-				var box = new THREE.BoxGeometry(boxSize, boxSize, boxSize);
-        var sphere = new THREE.SphereGeometry(boxSize/8, boxSize/8, boxSize/8);
-
-				for ( var i = 0; i < numBoxes; i ++ ) {
-					var object = new THREE.Mesh( box, new THREE.MeshLambertMaterial( { color: "#966F33"} ) );
-					object.position.x = Math.random() * (X - boxSize / 2);
-					object.position.y = boxSize/2;
-					object.position.z = Math.random() * (Z - boxSize / 2);
-					object.castShadow = true;
-					object.receiveShadow = true;
-					scene.add( object );
-					objects.push( object );
-
-          object2 = new THREE.Mesh( sphere, new THREE.MeshLambertMaterial( { color: "white"} ) );
-					object2.position.x = object.position.x;
-					object2.position.y = object.position.y + (boxSize * 5 / 8) ;
-					object2.position.z = object.position.z;
-					object2.castShadow = true;
-					object2.receiveShadow = true;
-					scene.add( object2 );
-					objects.push( object2 );
-
-					var sound1 = new Howl({
-			    	src: ['./media/knock.mp3'],
-						autoplay: true,
-			  		loop: true,
-						volume: 1 / numBoxes,
-						pos: [object2.position.x, object2.position.y, object2.position.z]
-			  	});
-				}
-
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.type = THREE.PCFShadowMap;
-				container.appendChild( renderer.domElement );
-				window.addEventListener( 'resize', onWindowResize, false );
-			}
-
-			function onWindowResize() {
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
-				renderer.setSize( window.innerWidth, window.innerHeight );
-			}
-
-			function animate() {
-				requestAnimationFrame( animate );
-				render();
-			}
-
-			function render() {
-				controls.update();
-				renderer.render( scene, camera );
-			}
-
-		</script>
-
+		<div class="circle option hidden">
+			Radius:
+  		<input id="radius" type="number" min="50" max="1000" value=100>
+		</div>
 	</body>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script>
+
+		function generateEnvironment() {
+			var arrangement = $("#arrangement").val()
+			var X = $("#X").val()
+			var Y = $("#Y").val()
+			var Z = $("#Z").val()
+			var size = $("#size").val()
+			var material = $("#material").val()
+
+			var url = arrangement +'.html'
+				+ '?X=' + X
+				+ '?X=' + Y
+				+ '?Z=' + Z
+				+ '?Size=' + size
+				+ '?Material=' + material;
+
+			if (arrangement === "random") {
+					var numObjects = $("#objects").val()
+ 					url += '?NumObjects=' + numObjects;
+			} else if (arrangement === "circle") {
+					var numObjects = $("#objects").val()
+ 					url += '?NumObjects=' + numObjects;
+					var radius = $("#radius").val()
+ 					url += '?Radius=' + radius;
+			} else if (arrangement === "cluster") {
+					var clusterSize = $("#clusterSize").val()
+ 					url += '?ClusterSize=' + clusterSize;
+					var numClusters = $("#numClusters").val()
+ 					url += '?NumClusters=' + numClusters;
+			}
+
+			var redirectWindow = window.open(url, '_blank');
+    	redirectWindow.location;
+		}
+
+		function updateOptions() {
+			var arrangement = $("#arrangement").val()
+			$(".option").addClass("hidden")
+			$("." + arrangement).removeClass("hidden")
+		}
+	</script>
 </html>

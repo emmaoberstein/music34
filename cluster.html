@@ -15,13 +15,13 @@
 	</head>
 	<body>
 
-    <script src="./../js/howler.min.js"></script>
-    <script src="./../js/howler.spatial.min.js"></script>
-		<script src="./../js/three.min.js"></script>
-		<script src="./../js/OrbitControls.js"></script>
+    <script src="./js/howler.min.js"></script>
+    <script src="./js/howler.spatial.min.js"></script>
+		<script src="./js/three.min.js"></script>
+		<script src="./js/OrbitControls.js"></script>
 
 		<!-- mine --->
-		<script src="./../js/utils.js"></script>
+		<script src="./js/utils.js"></script>
 
 		<script>
 			// https://vimeo.com/97347144
@@ -44,7 +44,7 @@
 				Z = 600;
 			}
 
-			let boxSize = parseInt(getParameterByName('BoxSize'));
+			let boxSize = parseInt(getParameterByName('Size'));
 			if (isNaN(boxSize)) {
 				boxSize = 40;
 			}
@@ -57,6 +57,18 @@
 			let clusterSize = parseInt(getParameterByName('ClusterSize'));
 			if (isNaN(clusterSize)) {
 				clusterSize = 5;
+			}
+
+			let material = getParameterByName('Material');
+			if (material == null || material == "wood") {
+				material = "wood";
+				xSize = boxSize
+				ySize = boxSize
+				zSize = boxSize
+			} else if (material === "metal") {
+				xSize = 1
+				ySize = boxSize
+				zSize = 1
 			}
 
 			init();
@@ -74,7 +86,6 @@
 
 				Howler.pos(camera.position.x, camera.position.y , camera.position.z );
 				Howler.orientation(camera.rotation._x, camera.rotation._y, camera.rotation._z);
-				console.log(camera);
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xf0f0f0 );
@@ -96,38 +107,73 @@
 					scene.add(wallGeometries[wall]);
 				}
 
-				var box = new THREE.BoxGeometry(boxSize, boxSize, boxSize);
-        var sphere = new THREE.SphereGeometry(boxSize/8, boxSize/8, boxSize/8);
-
 				for ( var i = 0; i < numClusters; i ++ ) {
-					let clusterCoord = [Math.random() * (X - boxSize**2 / 5), boxSize/2, Math.random() * (X - boxSize**2 / 5)]
+					let clusterCoord = [Math.random() * (X - 5 * xSize), ySize/2, Math.random() * (Z - 5 * zSize)]
 					for ( var j = 0; j < clusterSize; j ++ ) {
-						var object = new THREE.Mesh( box, new THREE.MeshLambertMaterial( { color: "#966F33"} ) );
-						object.position.x = clusterCoord[0] + Math.random() * boxSize**2 / 5;
-						object.position.y = clusterCoord[1];
-						object.position.z = clusterCoord[2] + Math.random() * boxSize**2 / 5;
-						object.castShadow = true;
-						object.receiveShadow = true;
-						scene.add( object );
-						objects.push( object );
 
-	          object2 = new THREE.Mesh( sphere, new THREE.MeshLambertMaterial( { color: "white"} ) );
-						object2.position.x = object.position.x;
-						object2.position.y = object.position.y + (boxSize * 5 / 8) ;
-						object2.position.z = object.position.z;
-						object2.castShadow = true;
-						object2.receiveShadow = true;
-						scene.add( object2 );
-						objects.push( object2 );
+						if (material === "wood") {
 
-						var sound1 = new Howl({
-				    	src: ['./../media/knock.mp3'],
-							loop: true,
-							autoplay: true,
-							volume: boxSize / X + boxSize / Y + boxSize / Z ,
-							pos: [object2.position.x, object2.position.y, object2.position.z],
-							key: [Math.random() * 1000] // random offset
-				  	});
+							var box = new THREE.BoxGeometry(boxSize, boxSize, boxSize);
+							var sphere = new THREE.SphereGeometry(boxSize/8, boxSize/8, boxSize/8);
+
+							var object = new THREE.Mesh( box, new THREE.MeshLambertMaterial( { color: "#966F33"} ) );
+							object.position.x = clusterCoord[0] + Math.random() * 5 * boxSize ;
+							object.position.y = clusterCoord[1];
+							object.position.z = clusterCoord[2] + Math.random() * 5 * boxSize ;
+							object.castShadow = true;
+							object.receiveShadow = true;
+							scene.add( object );
+							objects.push( object );
+
+		          object2 = new THREE.Mesh( sphere, new THREE.MeshLambertMaterial( { color: "white"} ) );
+							object2.position.x = object.position.x;
+							object2.position.y = object.position.y + (boxSize * 5 / 8) ;
+							object2.position.z = object.position.z;
+							object2.castShadow = true;
+							object2.receiveShadow = true;
+							scene.add( object2 );
+							objects.push( object2 );
+
+							var sound1 = new Howl({
+					    	src: ['./media/wood.mp3'],
+								loop: true,
+								autoplay: true,
+								volume: boxSize / X + boxSize / Y + boxSize / Z ,
+								pos: [object2.position.x, object2.position.y, object2.position.z],
+								key: [Math.random() * 1000] // random offset
+					  	});
+						}
+						else if (material === "metal") {
+							var rod = new THREE.CylinderGeometry(1, 1, boxSize, 32);
+							var base = new THREE.CylinderGeometry(3, 3, boxSize/20, 32);
+
+							var object = new THREE.Mesh( rod, new THREE.MeshLambertMaterial( { color: "gray"} ) );
+							object.position.x = clusterCoord[0] + Math.random() *  5;
+							object.position.y = clusterCoord[1];
+							object.position.z = clusterCoord[2] + Math.random() * 5;
+							object.castShadow = true;
+							object.receiveShadow = true;
+							scene.add( object );
+							objects.push( object );
+
+							object2 = new THREE.Mesh( base, new THREE.MeshLambertMaterial( { color: "white"} ) );
+							object2.position.x = object.position.x;
+							object2.position.y = object.position.y - 19*boxSize/40;
+							object2.position.z = object.position.z;
+							object2.castShadow = true;
+							object2.receiveShadow = true;
+							scene.add( object2 );
+							objects.push( object2 );
+
+							var sound1 = new Howl({
+					    	src: ['./media/' + material + '.mp3'],
+								loop: true,
+								autoplay: true,
+								volume: xSize / X + ySize / Y + zSize / Z ,
+								pos: [object.position.x, object.position.y, object.position.z],
+								key: [Math.random() * 1000] // random offset
+					  	});
+						}
 					}
 				}
 
