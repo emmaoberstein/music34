@@ -1,24 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>3D Virtual Environment Generator</title>
+		<title>3D Sonic Environment Generator</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 		<style>
 			body {
 				font-family: Monospace;
-				background-color: #f0f0f0;
+				background-color: rgba(0,0,0,.95);
 				margin: 0px;
 				overflow: hidden;
 				text-align: center;
+				color: white;
+				overflow-y: scroll;
+				min-width: 700px;
+			}
+
+			h1 {
+				font-size: 30px;
+				margin: 30px;
 			}
 
 			div {
 				padding: 5px;
+				font-size: 20px;
+			}
+
+			select {
+				font-family: Monospace;
+				font-size: 20px;
+				color: black;
+				width: 210px;
+				padding: 10px;
+			}
+
+			input {
+				font-family: Monospace;
+				font-size: 20px;
+				color: black;
+				border-radius: 5px;
+				width: 220px;
 			}
 
 			button {
-				margin: 10px
+				font-family: Monospace;
+				margin: 10px;
+				font-size: 20px;
+				border-radius: 5px;
+				background-color: #337ab7;
+				color: white;
+				margin: 20px;
+				padding: 10px;
+				cursor: pointer;
+				width: 600px;
 			}
 
 			.hidden {
@@ -28,73 +63,138 @@
 		</style>
 	</head>
 	<body>
-		<h1>3D Virtual Environment Generator</h1>
+		<h1>3D Sonic Environment Generator</h1>
 
-		</div>
-			<button onclick="generateEnvironment()">generate environment</button>
-		</div>
-
-		<div>
-			Arrangement:
-			<select onchange="updateOptions()" id="arrangement">
-		    <option value="random">random</option>
-		    <option value="cluster">cluster</option>
-		    <option value="circle">circle</option>
-		    <option value="spiral">fibonacci spiral</option>
-	  	</select>
+		<div class="row">
+			<div class="col-md-offset-3 col-md-3">
+				audio engine:
+			</div>
+			<div class="col-md-3">
+				<select onchange="updateEngineOptions()" id="engine">
+			    <option value="resonance">resonance audio</option>
+			    <option value="howler">howler</option>
+		  	</select>
+			</div>
 		</div>
 
-		<div>
-			Material:
-			<select id="material">
-			<option value="metal">metal rod</option>
-		    <option value="wood">ball on wood</option>
-	  	</select>
+		<div class="ambisonics row">
+			<div class="col-md-offset-3 col-md-3">
+				ambisonics order:
+			</div>
+			<div class="col-md-3">
+  			<input id="ambisonics" type="number" min="1" max="3" value=1>
+			</div>
 		</div>
 
-		<div>
-			Size:
-  		<input id="size" type="number" min="1" max="100" value=50>
+		<div class="row">
+			<div class="col-md-offset-3 col-md-3">
+				arrangement:
+			</div>
+			<div class="col-md-3">
+				<select onchange="updateOptions()" id="arrangement">
+			    <option value="random">random</option>
+			    <option value="cluster">cluster</option>
+			    <option value="circle">circle</option>
+			    <option value="spiral">fibonacci spiral</option>
+		  	</select>
+			</div>
 		</div>
 
-		<div>
-			X:
-  		<input id="X" type="number" min="100" max="10000" value=500>
-		</div>
-		<div>
-			Y:
-  		<input id="Y" type="number" min="100" max="10000" value=250>
-		</div>
-		<div>
-			Z:
-  		<input id="Z" type="number" min="100" max="10000" value=500>
-		</div>
-
-		<div class="random circle option">
-			Objects:
-  		<input id="objects" type="number" min="1" max="500" value=50>
+		<div class="row">
+			<div class="col-md-offset-3 col-md-3">
+				material:
+			</div>
+			<div class="col-md-3">
+				<select id="material">
+				<option value="metal">metal rod</option>
+			    <option value="wood">ball on wood</option>
+		  	</select>
+			</div>
 		</div>
 
-		<div class="cluster option hidden">
-			Clusters:
-  		<input id="numClusters" type="number" min="1" max="20" value=5>
+		<div class="row">
+			<div class="col-md-offset-3 col-md-3">
+				size:
+			</div>
+			<div class="col-md-3">
+  			<input id="size" type="number" min="1" max="100" value=50>
+			</div>
 		</div>
 
-		<div class="cluster option hidden">
-			Cluster Size:
-  		<input id="clusterSize" type="number" min="1" max="100" value=5>
+		<div class="row">
+			<div class="col-md-offset-3 col-md-3">
+				X:
+			</div>
+			<div class="col-md-3">
+  			<input id="X" type="number" min="100" max="10000" value=500>
+			</div>
 		</div>
 
-		<div class="circle option hidden">
-			Radius:
-  		<input id="radius" type="number" min="50" max="1000" value=100>
+		<div class="row">
+			<div class="col-md-offset-3 col-md-3">
+				Y:
+			</div>
+			<div class="col-md-3">
+  			<input id="Y" type="number" min="100" max="10000" value=250>
+			</div>
 		</div>
+
+		<div class="row">
+			<div class="col-md-offset-3 col-md-3">
+				Z:
+			</div>
+			<div class="col-md-3">
+  			<input id="Z" type="number" min="100" max="10000" value=500>
+			</div>
+		</div>
+
+		<div class="random circle option row">
+			<div class="col-md-offset-3 col-md-3">
+				objects:
+			</div>
+			<div class="col-md-3">
+  			<input id="objects" type="number" min="1" max="500" value=50>
+			</div>
+		</div>
+
+		<div class="cluster option hidden row">
+			<div class="col-md-offset-3 col-md-3">
+				clusters:
+			</div>
+			<div class="col-md-3">
+  			<input id="numClusters" type="number" min="1" max="20" value=5>
+			</div>
+		</div>
+
+		<div class="cluster option hidden row">
+			<div class="col-md-offset-3 col-md-3">
+				cluster size:
+			</div>
+			<div class="col-md-3">
+  			<input id="clusterSize" type="number" min="1" max="100" value=5>
+			</div>
+		</div>
+
+		<div class="circle option hidden row">
+			<div class="col-md-offset-3 col-md-3">
+				radius:
+			</div>
+			<div class="col-md-3">
+  			<input id="radius" type="number" min="50" max="1000" value=100>
+			</div>
+		</div>
+
+		</div>
+			<button onclick="generateEnvironment()">generate</button>
+		</div>
+
 	</body>
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	<script>
 
 		function generateEnvironment() {
+			var engine = $("#engine").val()
 			var arrangement = $("#arrangement").val()
 			var X = $("#X").val()
 			var Y = $("#Y").val()
@@ -102,9 +202,9 @@
 			var size = $("#size").val()
 			var material = $("#material").val()
 
-			var url = arrangement +'.html'
+			var url = engine + "/" + arrangement +'.html'
 				+ '?X=' + X
-				+ '?X=' + Y
+				+ '?Y=' + Y
 				+ '?Z=' + Z
 				+ '?Size=' + size
 				+ '?Material=' + material;
@@ -124,8 +224,22 @@
  					url += '?NumClusters=' + numClusters;
 			}
 
+			if (engine == "resonance") {
+				var order = $("#ambisonics").val()
+				url += '?Order=' + order;
+			}
+
 			var redirectWindow = window.open(url, '_blank');
     	redirectWindow.location;
+		}
+
+		function updateEngineOptions() {
+			var engine = $("#engine").val()
+			if (engine == "resonance") {
+				$(".ambisonics").removeClass("hidden")
+			} else {
+				$(".ambisonics").addClass("hidden")
+			}
 		}
 
 		function updateOptions() {

@@ -15,13 +15,13 @@
 	</head>
 	<body>
 
-    <script src="./js/howler.min.js"></script>
-    <script src="./js/howler.spatial.min.js"></script>
-		<script src="./js/three.min.js"></script>
-		<script src="./js/OrbitControls.js"></script>
+    <script src="../js/howler.min.js"></script>
+    <script src="../js/howler.spatial.min.js"></script>
+		<script src="../js/three.min.js"></script>
+		<script src="../js/OrbitControls.js"></script>
 
 		<!-- mine --->
-		<script src="./js/utils.js"></script>
+		<script src="../js/utils.js"></script>
 
 		<script>
 			// https://vimeo.com/97347144
@@ -135,7 +135,7 @@
 							objects.push( object2 );
 
 							var sound1 = new Howl({
-					    	src: ['./media/wood.mp3'],
+					    	src: ['../media/wood.mp3'],
 								loop: true,
 								autoplay: true,
 								volume: boxSize / X + boxSize / Y + boxSize / Z ,
@@ -166,7 +166,7 @@
 							objects.push( object2 );
 
 							var sound1 = new Howl({
-					    	src: ['./media/' + material + '.mp3'],
+					    	src: ['../media/' + material + '.mp3'],
 								loop: true,
 								autoplay: true,
 								volume: xSize / X + ySize / Y + zSize / Z ,
@@ -201,7 +201,7 @@
 				controls.update();
 				Howler.pos(camera.position.x, camera.position.y , camera.position.z);
 				Howler.orientation(camera.rotation._x, camera.rotation._y, camera.rotation._z);
-				Howler.volume(1 - Math.sqrt(camera.position.x**2 + camera.position.y**2 + camera.position.z**2) / 5000)
+				Howler.volume(.1)
 				renderer.render( scene, camera );
 			}
 

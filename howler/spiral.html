@@ -15,13 +15,13 @@
 	</head>
 	<body>
 
-    <script src="./js/howler.min.js"></script>
-    <script src="./js/howler.spatial.min.js"></script>
-		<script src="./js/three.min.js"></script>
-		<script src="./js/OrbitControls.js"></script>
+    <script src="../js/howler.min.js"></script>
+    <script src="../js/howler.spatial.min.js"></script>
+		<script src="../js/three.min.js"></script>
+		<script src="../js/OrbitControls.js"></script>
 
 		<!-- mine --->
-		<script src="./js/utils.js"></script>
+		<script src="../js/utils.js"></script>
 
 		<script>
 			// https://vimeo.com/97347144
@@ -98,21 +98,24 @@
 
 				for (wall in wallGeometries) {
 					scene.add(wallGeometries[wall]);
-			}
+				}
 
-				var theta = ((Math.PI*2) / numObjects);
-				for (var i = 1; i <= numObjects; i++) {
+				radius = X / 2;
+				if (Z > X) radius = Z / 2;
+				console.log(radius)
 
-					 var angle = (theta * i);
+				var path = getSpiral({x: 0, y:0 }, {x:10, y:10}, radius)
+
+				for (var i = 0; i < path.length; i += 10) {
 					 if (material === "wood") {
 
  						var box = new THREE.BoxGeometry(boxSize, boxSize, boxSize);
  						var sphere = new THREE.SphereGeometry(boxSize/8, boxSize/8, boxSize/8);
 
  						var object = new THREE.Mesh( box, new THREE.MeshLambertMaterial( { color: "#966F33"} ) );
- 						object.position.x =  X / 2 + (radius * Math.cos(angle));
+ 						object.position.x =  path[i].x + X/2
  						object.position.y = boxSize/2;
- 						object.position.z = Z / 2 + (radius * Math.sin(angle));
+ 						object.position.z = path[i].y + Z/2
  						object.castShadow = true;
  						object.receiveShadow = true;
  						scene.add( object );
@@ -128,7 +131,7 @@
  						objects.push( object2 );
 
  						var sound1 = new Howl({
- 				    	src: ['./media/' + material + '.mp3'],
+ 				    	src: ['../media/' + material + '.mp3'],
  							loop: true,
  							autoplay: true,
  							volume: boxSize / X + boxSize / Y + boxSize / Z ,
@@ -143,9 +146,9 @@
 						var base = new THREE.CylinderGeometry(3, 3, boxSize/20, 32);
 
  						var object = new THREE.Mesh( rod, new THREE.MeshLambertMaterial( { color: "gray"} ) );
- 						object.position.x = X / 2 + (radius * Math.cos(angle));
+ 						object.position.x = path[i].x + X/2
  						object.position.y = boxSize/2;
- 						object.position.z = Z / 2 + (radius * Math.sin(angle));
+ 						object.position.z = path[i].y + Z/2
  						object.castShadow = true;
  						object.receiveShadow = true;
  						scene.add( object );
@@ -162,8 +165,8 @@
 						objects.push( object2 );
 
 
- 						vasound1 = new Howl({
- 				    	src: ['./media/' + material + '.mp3'],
+ 						var sound1 = new Howl({
+ 				    	src: ['../media/' + material + '.mp3'],
  							loop: true,
  							autoplay: true,
  							volume: 1 / X + boxSize / Y + 1 / Z ,
@@ -198,9 +201,94 @@
 				controls.update();
 				Howler.pos(camera.position.x, camera.position.y , camera.position.z);
 				Howler.orientation(camera.rotation._x, camera.rotation._y, camera.rotation._z);
-				Howler.volume(1 - Math.sqrt(camera.position.x**2 + camera.position.y**2 + camera.position.z**2) / 5000)
+				Howler.volume(.1)
 				renderer.render( scene, camera );
 			}
+
+			// https://stackoverflow.com/questions/33232159/fibonacci-spiral-drawing-in-html5-canvas
+			function getDistance(p1, p2){
+			    return Math.sqrt(Math.pow(p1.x-p2.x, 2) + Math.pow(p1.y-p2.y, 2));
+			};
+
+			function getAngle(p1, p2){
+			    return Math.atan2(p2.y-p1.y, p2.x-p1.x);
+			};
+
+			function FibonacciGenerator() {
+		    var thisFibonacci = this;
+
+		    // Start with 0 1 2... instead of the real sequence 0 1 1 2...
+		    thisFibonacci.array = [0, 1, 2];
+
+		    thisFibonacci.getDiscrete = function(n){
+
+		        // If the Fibonacci number is not in the array, calculate it
+		        while (n >= thisFibonacci.array.length){
+		            var length = thisFibonacci.array.length;
+		            var nextFibonacci = thisFibonacci.array[length - 1] + thisFibonacci.array[length - 2];
+		            thisFibonacci.array.push(nextFibonacci);
+		        }
+
+		        return thisFibonacci.array[n];
+		    };
+
+		    thisFibonacci.getNumber = function(n){
+		        var floor = Math.floor(n);
+		        var ceil = Math.ceil(n);
+
+		        if (Math.floor(n) == n){
+		            return thisFibonacci.getDiscrete(n);
+		        }
+
+		        var a = Math.pow(n - floor, 1.15);
+
+		        var fibFloor = thisFibonacci.getDiscrete(floor);
+		        var fibCeil = thisFibonacci.getDiscrete(ceil);
+
+		        return fibFloor + a * (fibCeil - fibFloor);
+		    };
+
+		    return thisFibonacci;
+			};
+
+			function getSpiral(pA, pB, maxRadius){
+		    // 1 step = 1/4 turn or 90º
+		    var precision = 50; // Lines to draw in each 1/4 turn
+		    var stepB = 4; // Steps to get to point B
+
+		    var angleToPointB = getAngle(pA,pB); // Angle between pA and pB
+		    var distToPointB = getDistance(pA,pB); // Distance between pA and pB
+
+		    var fibonacci = new FibonacciGenerator();
+
+		    // Find scale so that the last point of the curve is at distance to pB
+		    var radiusB = fibonacci.getNumber(stepB);
+		    var scale = distToPointB / radiusB;
+
+		    // Find angle offset so that last point of the curve is at angle to pB
+		    var angleOffset = angleToPointB - stepB * Math.PI / 2;
+
+		    var path = [];
+		    var i, step , radius, angle;
+
+		    // Start at the center
+		    i = step = radius = angle = 0;
+
+		    // Continue drawing until reaching maximum radius
+		    while (radius * scale <= maxRadius){
+
+		        path.push({
+		            x: scale * radius * Math.cos(angle + angleOffset) + pA.x,
+		            y: scale * radius * Math.sin(angle + angleOffset) + pA.y
+		        });
+
+		        i++; // Next point
+		        step = i / precision; // 1/4 turns at point
+		        radius = fibonacci.getNumber(step); // Radius of Fibonacci spiral
+		        angle = step * Math.PI / 2; // Radians at point
+		    }
+		    return path;
+		};
 
 		</script>
 

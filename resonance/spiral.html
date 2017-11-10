@@ -15,19 +15,19 @@
 	</head>
 	<body>
 
-    <script src="./js/howler.min.js"></script>
-    <script src="./js/howler.spatial.min.js"></script>
-		<script src="./js/three.min.js"></script>
-		<script src="./js/OrbitControls.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/resonance-audio/build/resonance-audio.min.js"></script>
+		<script src="../js/three.min.js"></script>
+		<script src="../js/OrbitControls.js"></script>
 
 		<!-- mine --->
-		<script src="./js/utils.js"></script>
+		<script src="../js/utils.js"></script>
 
 		<script>
 			// https://vimeo.com/97347144
 			var container;
 			var camera, controls, scene, renderer;
 			var objects = [];
+			var audioScene
 
 			let X = parseInt(getParameterByName('X'));
 			if (isNaN(X)) {
@@ -64,6 +64,16 @@
 				material = "wood";
 			}
 
+			let order = parseInt(getParameterByName('Order'));
+			if (isNaN(order)) {
+				order = 1;
+			}
+
+			let control = parseInt(getParameterByName('Control'));
+			if (isNaN(control)) {
+				control = 1;
+			}
+
 			init();
 			animate();
 
@@ -72,13 +82,10 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.x = X / 2;
+				camera.position.x = X / 2 + 100;
 				camera.position.y = Y / 3;
-				camera.position.z = Z / 2;
+				camera.position.z = Z / 2 + 100;
 				controls = new THREE.OrbitControls( camera );
-
-				Howler.pos(camera.position.x, camera.position.y , camera.position.z );
-				Howler.orientation(camera.rotation._x, camera.rotation._y, camera.rotation._z);
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xf0f0f0 );
@@ -103,6 +110,18 @@
 				radius = X / 2;
 				if (Z > X) radius = Z / 2;
 				console.log(radius)
+
+				// Create <audio> streaming audio source.
+				var audioContext = new (window.AudioContext || window.webkitAudioContext);
+
+				// Create gain nodes.
+				var gain = audioContext.createGain();
+				gain.gain.value = 1;
+
+				// Initialize scene and create Source
+				audioScene = new ResonanceAudio(audioContext, {ambisonicOrder: order});
+				audioScene.setListenerPosition(camera.position.x, camera.position.y , camera.position.z);
+
 
 				var path = getSpiral({x: 0, y:0 }, {x:10, y:10}, radius)
 
@@ -130,14 +149,32 @@
  						scene.add( object2 );
  						objects.push( object2 );
 
- 						var sound1 = new Howl({
- 				    	src: ['./media/' + material + '.mp3'],
- 							loop: true,
- 							autoplay: true,
- 							volume: boxSize / X + boxSize / Y + boxSize / Z ,
- 							pos: [object2.position.x, object2.position.y, object2.position.z],
- 							key: [Math.random() * 1000] // random offset
- 				  	});
+						// ADD SOUND
+						var source = audioScene.createSource();
+						source.setPosition(object2.position.x, object2.position.y, object2.position.z);
+
+						// Connect audio graph.
+						audioScene.output.connect(gain);
+						gain.connect(audioContext.destination);
+
+						let audioSource = 'https://emmaoberstein.github.io/music34/media/' + material + '.mp3';
+						let audioElement = document.createElement('audio');
+						audioElement.src = audioSource;
+						audioElement.crossOrigin = "anonymous";
+						audioElement.load();
+						audioElement.onended = function(){
+							this.currentTime = 0;
+							var delay = setTimeout(function(){
+								audioElement.play();
+								clearTimeout(delay);
+								console.log("playing")
+							}, Math.random() * 100);
+						}
+
+						audioElementSource = audioContext.createMediaElementSource(audioElement);
+						audioElementSource.connect(source.input);
+
+						audioElement.play();
 
  					}
  					else if (material === "metal") {
@@ -164,15 +201,33 @@
 						scene.add( object2 );
 						objects.push( object2 );
 
+						// ADD SOUND
+						var source = audioScene.createSource();
+						source.setPosition(object.position.x, object.position.y, object.position.z);
 
- 						vasound1 = new Howl({
- 				    	src: ['./media/' + material + '.mp3'],
- 							loop: true,
- 							autoplay: true,
- 							volume: 1 / X + boxSize / Y + 1 / Z ,
- 							pos: [object.position.x, object.position.y, object.position.z],
- 							key: [Math.random() * 1000] // random offset
- 				  	});
+						// Connect audio graph.
+						audioScene.output.connect(gain);
+						gain.connect(audioContext.destination);
+
+						let audioSource = 'https://emmaoberstein.github.io/music34/media/' + material + '.mp3';
+						let audioElement = document.createElement('audio');
+						audioElement.src = audioSource;
+						audioElement.crossOrigin = "anonymous";
+						audioElement.load();
+						var offset = i * 100 % 1000
+						audioElement.onended = function(){
+							this.currentTime = 0;
+							var delay = setTimeout(function(){
+								audioElement.play();
+								clearTimeout(delay);
+								console.log("playing")
+							}, offset);
+						}
+
+						audioElementSource = audioContext.createMediaElementSource(audioElement);
+						audioElementSource.connect(source.input);
+
+						audioElement.play();
  					}
 
 				}
@@ -193,15 +248,14 @@
 			}
 
 			function animate() {
-				requestAnimationFrame( animate );
+				if (control == 2) {
+					requestAnimationFrame( animate );
+				}
 				render();
 			}
 
 			function render() {
 				controls.update();
-				Howler.pos(camera.position.x, camera.position.y , camera.position.z);
-				Howler.orientation(camera.rotation._x, camera.rotation._y, camera.rotation._z);
-				Howler.volume(1 - Math.sqrt(camera.position.x**2 + camera.position.y**2 + camera.position.z**2) / 5000)
 				renderer.render( scene, camera );
 			}
 

@@ -15,13 +15,13 @@
 	</head>
 	<body>
 
-    <script src="./js/howler.min.js"></script>
-    <script src="./js/howler.spatial.min.js"></script>
-		<script src="./js/three.min.js"></script>
-		<script src="./js/OrbitControls.js"></script>
+    <script src="../js/howler.min.js"></script>
+    <script src="../js/howler.spatial.min.js"></script>
+		<script src="../js/three.min.js"></script>
+		<script src="../js/OrbitControls.js"></script>
 
 		<!-- mine --->
-		<script src="./js/utils.js"></script>
+		<script src="../js/utils.js"></script>
 
 		<script>
 			// https://vimeo.com/97347144
@@ -46,20 +46,23 @@
 
 			let boxSize = parseInt(getParameterByName('Size'));
 			if (isNaN(boxSize)) {
-				boxSize = 40;
+				boxSize = 20;
 			}
 
-			let numBoxes = parseInt(getParameterByName('NumObjects'));
-			if (isNaN(numBoxes)) {
-				numBoxes = 50;
+			let numObjects = parseInt(getParameterByName('NumObjects'));
+			if (isNaN(numObjects)) {
+				numObjects = 10;
+			}
+
+			let radius = parseInt(getParameterByName('Radius'));
+			if (isNaN(radius)) {
+				radius = 100;
 			}
 
 			let material = getParameterByName('Material');
 			if (material == null) {
 				material = "wood";
 			}
-
-			console.log(material)
 
 			init();
 			animate();
@@ -95,56 +98,59 @@
 
 				for (wall in wallGeometries) {
 					scene.add(wallGeometries[wall]);
-				}
+			}
 
-				for ( var i = 0; i < numBoxes; i ++ ) {
+				var theta = ((Math.PI*2) / numObjects);
+				for (var i = 1; i <= numObjects; i++) {
 
-					if (material === "wood") {
+					 var angle = (theta * i);
+					 if (material === "wood") {
 
-						var box = new THREE.BoxGeometry(boxSize, boxSize, boxSize);
-						var sphere = new THREE.SphereGeometry(boxSize/8, boxSize/8, boxSize/8);
+ 						var box = new THREE.BoxGeometry(boxSize, boxSize, boxSize);
+ 						var sphere = new THREE.SphereGeometry(boxSize/8, boxSize/8, boxSize/8);
 
-						var object = new THREE.Mesh( box, new THREE.MeshLambertMaterial( { color: "#966F33"} ) );
-						object.position.x = Math.random() * (X - boxSize / 2);
-						object.position.y = boxSize/2;
-						object.position.z = Math.random() * (Z - boxSize / 2);
-						object.castShadow = true;
-						object.receiveShadow = true;
-						scene.add( object );
-						objects.push( object );
+ 						var object = new THREE.Mesh( box, new THREE.MeshLambertMaterial( { color: "#966F33"} ) );
+ 						object.position.x =  X / 2 + (radius * Math.cos(angle));
+ 						object.position.y = boxSize/2;
+ 						object.position.z = Z / 2 + (radius * Math.sin(angle));
+ 						object.castShadow = true;
+ 						object.receiveShadow = true;
+ 						scene.add( object );
+ 						objects.push( object );
 
-	          object2 = new THREE.Mesh( sphere, new THREE.MeshLambertMaterial( { color: "white"} ) );
-						object2.position.x = object.position.x;
-						object2.position.y = object.position.y + (boxSize * 5 / 8) ;
-						object2.position.z = object.position.z;
-						object2.castShadow = true;
-						object2.receiveShadow = true;
-						scene.add( object2 );
-						objects.push( object2 );
+ 	          object2 = new THREE.Mesh( sphere, new THREE.MeshLambertMaterial( { color: "white"} ) );
+ 						object2.position.x = object.position.x;
+ 						object2.position.y = object.position.y + (boxSize * 5 / 8) ;
+ 						object2.position.z = object.position.z;
+ 						object2.castShadow = true;
+ 						object2.receiveShadow = true;
+ 						scene.add( object2 );
+ 						objects.push( object2 );
 
-						var sound1 = new Howl({
-				    	src: ['./media/' + material + '.mp3'],
-							loop: true,
-							autoplay: true,
-							volume: boxSize / X + boxSize / Y + boxSize / Z ,
-							pos: [object2.position.x, object2.position.y, object2.position.z],
-							key: [Math.random() * 1000] // random offset
-				  	});
+ 						var sound1 = new Howl({
+ 				    	src: ['../media/' + material + '.mp3'],
+ 							loop: true,
+ 							autoplay: true,
+ 							volume: boxSize / X + boxSize / Y + boxSize / Z ,
+ 							pos: [object2.position.x, object2.position.y, object2.position.z],
+ 							key: [Math.random() * 1000] // random offset
+ 				  	});
 
-					}
-					else if (material === "metal") {
+ 					}
+ 					else if (material === "metal") {
 
-						var rod = new THREE.CylinderGeometry(1, 1, boxSize, 32);
+ 						var rod = new THREE.CylinderGeometry(1, 1, boxSize, 32);
 						var base = new THREE.CylinderGeometry(3, 3, boxSize/20, 32);
 
-						var object = new THREE.Mesh( rod, new THREE.MeshLambertMaterial( { color: "gray"} ) );
-						object.position.x = Math.random() * (X - boxSize / 2);
-						object.position.y = boxSize/2;
-						object.position.z = Math.random() * (Z - boxSize / 2);
-						object.castShadow = true;
-						object.receiveShadow = true;
-						scene.add( object );
-						objects.push( object );
+ 						var object = new THREE.Mesh( rod, new THREE.MeshLambertMaterial( { color: "gray"} ) );
+ 						object.position.x = X / 2 + (radius * Math.cos(angle));
+ 						object.position.y = boxSize/2;
+ 						object.position.z = Z / 2 + (radius * Math.sin(angle));
+ 						object.castShadow = true;
+ 						object.receiveShadow = true;
+ 						scene.add( object );
+ 						objects.push( object );
+
 
 						object2 = new THREE.Mesh( base, new THREE.MeshLambertMaterial( { color: "white"} ) );
 						object2.position.x = object.position.x;
@@ -155,15 +161,17 @@
 						scene.add( object2 );
 						objects.push( object2 );
 
-						var sound1 = new Howl({
-				    	src: ['./media/' + material + '.mp3'],
-							loop: true,
-							autoplay: true,
-							volume: 1 / X + boxSize / Y + 1 / Z ,
-							pos: [object.position.x, object.position.y, object.position.z],
-							key: [Math.random() * 1000] // random offset
-				  	});
-					}
+
+ 						var sound1 = new Howl({
+ 				    	src: ['../media/' + material + '.mp3'],
+ 							loop: true,
+ 							autoplay: true,
+ 							volume: 1 / X + boxSize / Y + 1 / Z ,
+ 							pos: [object.position.x, object.position.y, object.position.z],
+ 							key: [Math.random() * 1000] // random offset
+ 				  	});
+ 					}
+
 				}
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -190,7 +198,7 @@
 				controls.update();
 				Howler.pos(camera.position.x, camera.position.y , camera.position.z);
 				Howler.orientation(camera.rotation._x, camera.rotation._y, camera.rotation._z);
-				Howler.volume(1 - Math.sqrt(camera.position.x**2 + camera.position.y**2 + camera.position.z**2) / 5000)
+				Howler.volume(.1)
 				renderer.render( scene, camera );
 			}
 
