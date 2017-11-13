@@ -67,6 +67,11 @@
 				order = 1;
 			}
 
+			let pitch = getParameterByName('Pitch');
+			if (pitch == null) {
+				pitch = "0";
+			}
+
 			init();
 			animate();
 
@@ -134,59 +139,7 @@
 
 				for ( var i = 0; i < numBoxes; i ++ ) {
 
-					if (material === "wood") {
-
-						var box = new THREE.BoxGeometry(boxSize, boxSize, boxSize);
-						var sphere = new THREE.SphereGeometry(boxSize/8, boxSize/8, boxSize/8);
-
-						var object = new THREE.Mesh( box, new THREE.MeshLambertMaterial( { color: "#966F33"} ) );
-						object.position.x = Math.random() * (X - boxSize / 2);
-						object.position.y = boxSize/2;
-						object.position.z = Math.random() * (Z - boxSize / 2);
-						object.castShadow = true;
-						object.receiveShadow = true;
-						scene.add( object );
-						objects.push( object );
-
-	          object2 = new THREE.Mesh( sphere, new THREE.MeshLambertMaterial( { color: "white"} ) );
-						object2.position.x = object.position.x;
-						object2.position.y = object.position.y + (boxSize * 5 / 8) ;
-						object2.position.z = object.position.z;
-						object2.castShadow = true;
-						object2.receiveShadow = true;
-						scene.add( object2 );
-						objects.push( object2 );
-
-						// add sound
-						var source = audioScene.createSource();
-						source.setPosition(object2.position.x, object2.position.y, object2.position.z);
-
-						// Connect audio graph.
-						audioScene.output.connect(gain);
-						gain.connect(audioContext.destination);
-
-						let audioSource = 'https://emmaoberstein.github.io/music34/media/' + material + '.mp3';
-						let audioElement = document.createElement('audio');
-						audioElement.src = audioSource;
-						audioElement.crossOrigin = "anonymous";
-						audioElement.playbackRate.value = .5
-						audioElement.load();
-						audioElement.onended = function(){
-							this.currentTime = 0;
-							var delay = setTimeout(function(){
-								audioElement.play();
-								clearTimeout(delay);
-								console.log("playing")
-							}, Math.random() * 100);
-						}
-
-						audioElementSource = audioContext.createMediaElementSource(audioElement);
-						audioElementSource.connect(source.input);
-
-						audioElement.play();
-
-					}
-					else if (material === "metal") {
+					if (material === "metal") {
 
 						var rod = new THREE.CylinderGeometry(.5, .5, boxSize, 32);
 						var base = new THREE.CylinderGeometry(1, 1, boxSize/20, 32);
@@ -217,7 +170,7 @@
 						audioScene.output.connect(gain);
 						gain.connect(audioContext.destination);
 
-						let audioSource = 'https://emmaoberstein.github.io/music34/media/' + material + '.mp3';
+						let audioSource = 'https://emmaoberstein.github.io/music34/media/' + material + "_" + pitch + '.wav';
 						let audioElement = document.createElement('audio');
 						audioElement.src = audioSource;
 						audioElement.crossOrigin = "anonymous";
