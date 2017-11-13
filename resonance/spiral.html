@@ -256,6 +256,7 @@
 
 			function render() {
 				controls.update();
+				audioScene.setListenerPosition(camera.position.x, camera.position.y , camera.position.z);
 				renderer.render( scene, camera );
 			}
 

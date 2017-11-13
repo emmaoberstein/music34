@@ -65,7 +65,7 @@
 
 			let control = parseInt(getParameterByName('Control'));
 			if (isNaN(control)) {
-				control = 1;
+				control = 2;
 			}
 
 			let material = getParameterByName('Material');
@@ -223,7 +223,6 @@
 
 							audioElementSource = audioContext.createMediaElementSource(audioElement);
 							audioElementSource.connect(source.input);
-
 							audioElement.play();
 
 						}
@@ -246,12 +245,15 @@
 			}
 
 			function animate() {
-				requestAnimationFrame( animate );
+				if (control == 2) {
+					requestAnimationFrame( animate );
+				}
 				render();
 			}
 
 			function render() {
 				controls.update();
+				audioScene.setListenerPosition(camera.position.x, camera.position.y , camera.position.z);
 				renderer.render( scene, camera );
 			}
 
