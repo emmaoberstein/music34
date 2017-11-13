@@ -111,12 +111,21 @@
 			</div>
 		</div>
 
-		<div class="row">
+		<div class="row size hidden">
 			<div class="col-md-offset-3 col-md-3">
 				size:
 			</div>
 			<div class="col-md-3">
   			<input id="size" type="number" min="1" max="100" value=50>
+			</div>
+		</div>
+
+		<div class="row ambisonics">
+			<div class="col-md-offset-3 col-md-3">
+				Pitch Shift (Semitones):
+			</div>
+			<div class="col-md-3">
+  			<input id="pitch" type="number" min="-5" max="5" value=0>
 			</div>
 		</div>
 
@@ -198,14 +207,12 @@
 			var X = $("#X").val()
 			var Y = $("#Y").val()
 			var Z = $("#Z").val()
-			var size = $("#size").val()
 			var material = $("#material").val()
 
 			var url = engine + "/" + arrangement +'.html'
 				+ '?X=' + X
 				+ '?Y=' + Y
 				+ '?Z=' + Z
-				+ '?Size=' + size
 				+ '?Material=' + material;
 
 			if (arrangement === "random") {
@@ -226,6 +233,11 @@
 			if (engine == "resonance") {
 				var order = $("#ambisonics").val()
 				url += '?Order=' + order;
+				var pitch = $("#pitch").val()
+				url += '?Pitch=' + pitch;
+			} else {
+				var size = $("#size").val()
+				url += '?Size=' + size
 			}
 
 			var redirectWindow = window.open(url, '_blank');
@@ -236,8 +248,10 @@
 			var engine = $("#engine").val()
 			if (engine == "resonance") {
 				$(".ambisonics").removeClass("hidden")
+				$(".size").addClass("hidden")
 			} else {
 				$(".ambisonics").addClass("hidden")
+				$(".size").removeClass("hidden")
 			}
 		}
 

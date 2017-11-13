@@ -47,10 +47,6 @@
 				Z = 600;
 			}
 
-			let boxSize = parseInt(getParameterByName('Size'));
-			if (isNaN(boxSize)) {
-				boxSize = 40;
-			}
 
 			let numBoxes = parseInt(getParameterByName('NumObjects'));
 			if (isNaN(numBoxes)) {
@@ -71,6 +67,8 @@
 			if (pitch == null) {
 				pitch = "0";
 			}
+
+			let boxSize = 50 + parseInt(pitch) * 7.5;
 
 			init();
 			animate();
