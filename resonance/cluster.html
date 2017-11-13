@@ -123,6 +123,27 @@
 			  audioScene = new ResonanceAudio(audioContext, {ambisonicOrder: order});
 				audioScene.setListenerPosition(camera.position.x, camera.position.y , camera.position.z);
 
+				let roomDimensions = {
+				  width: X,
+				  height: Y,
+				  depth: Z,
+				};
+
+				let roomMaterials = {
+				  // Room wall materials
+				  left: 'marble',
+				  right: 'marble',
+				  front: 'marble',
+				  back: 'marble',
+
+				  // Room floor
+				  down: 'marble',
+				  // Room ceiling
+				  up: 'marble',
+				};
+
+				audioScene.setRoomProperties(roomDimensions, roomMaterials);
+
 				for ( var i = 0; i < numClusters; i ++ ) {
 					let clusterCoord = [Math.random() * (X - 5 * xSize), ySize/2, Math.random() * (Z - 5 * zSize)]
 					for ( var j = 0; j < clusterSize; j ++ ) {

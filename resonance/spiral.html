@@ -119,6 +119,26 @@
 				audioScene = new ResonanceAudio(audioContext, {ambisonicOrder: order});
 				audioScene.setListenerPosition(camera.position.x, camera.position.y , camera.position.z);
 
+				let roomDimensions = {
+				  width: X,
+				  height: Y,
+				  depth: Z,
+				};
+
+				let roomMaterials = {
+				  // Room wall materials
+				  left: 'marble',
+				  right: 'marble',
+				  front: 'marble',
+				  back: 'marble',
+
+				  // Room floor
+				  down: 'marble',
+				  // Room ceiling
+				  up: 'marble',
+				};
+
+				audioScene.setRoomProperties(roomDimensions, roomMaterials);
 
 				var path = getSpiral({x: 0, y:0 }, {x:10, y:10}, radius)
 
