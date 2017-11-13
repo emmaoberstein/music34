@@ -176,6 +176,7 @@
 						let audioElement = document.createElement('audio');
 						audioElement.src = audioSource;
 						audioElement.crossOrigin = "anonymous";
+						audioElement.playbackRate.value = .5
 						audioElement.load();
 						audioElement.onended = function(){
 							this.currentTime = 0;

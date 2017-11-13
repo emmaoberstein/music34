@@ -72,6 +72,11 @@
 				order = 1;
 			}
 
+			let pitch = getParameterByName('Pitch');
+			if (pitch == null) {
+				pitch = "0";
+			}
+
 			init();
 			animate();
 
@@ -110,6 +115,15 @@
 
 				// Create <audio> streaming audio source.
 				var audioContext = new AudioContext();
+				var analyser = audioContext.createAnalyser();
+      	var delay = audioContext.createDelay();
+      	delay.delayTime.value = 4;
+
+      	jungle = new Jungle(audioContext);
+      	jungle.setPitchOffset(2);
+      	delay.connect(jungle.input);
+      	jungle.output.connect(audioContext.destination);
+      	jungle.output.connect(analyser);
 
 				// Create gain nodes.
 				var gain = audioContext.createGain();
@@ -139,6 +153,7 @@
 				};
 
 				audioScene.setRoomProperties(roomDimensions, roomMaterials);
+				console.log(audioScene)
 
 				var path = getSpiral({x: 0, y:0 }, {x:10, y:10}, radius)
 
@@ -226,10 +241,11 @@
 						audioScene.output.connect(gain);
 						gain.connect(audioContext.destination);
 
-						let audioSource = 'https://emmaoberstein.github.io/music34/media/' + material + '.mp3';
+						let audioSource = 'https://emmaoberstein.github.io/music34/media/' + material + "_" + pitch + '.wav';
 						let audioElement = document.createElement('audio');
 						audioElement.src = audioSource;
 						audioElement.crossOrigin = "anonymous";
+						audioElement.playbackRate.value = .5
 						audioElement.load();
 						var offset = i * 100 % 1000
 						audioElement.onended = function(){
