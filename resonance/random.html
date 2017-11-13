@@ -28,6 +28,9 @@
 			var camera, controls, scene, renderer;
 			var objects = [];
 			var audioScene
+			var oldX = 0;
+			var oldY = 0;
+			var oldZ = 0;
 
 			let X = parseInt(getParameterByName('X'));
 			if (isNaN(X)) {
@@ -62,11 +65,6 @@
 			let order = parseInt(getParameterByName('Order'));
 			if (isNaN(order)) {
 				order = 1;
-			}
-
-			let control = parseInt(getParameterByName('Control'));
-			if (isNaN(control)) {
-				control = 1;
 			}
 
 			init();
@@ -234,16 +232,20 @@
 			}
 
 			function animate() {
-				if (control == 2) {
-					requestAnimationFrame( animate );
+				requestAnimationFrame( animate );
+				if ((oldX != camera.position.x || oldY != camera.position.y || oldZ != camera.position.z)) {
+					render();
 				}
-				render();
 			}
 
 			function render() {
 				controls.update();
-				audioScene.setListenerPosition(camera.position.x, camera.position.y , camera.position.z);
 				renderer.render( scene, camera );
+
+				audioScene.setListenerPosition(camera.position.x, camera.position.y , camera.position.z);
+				oldX = camera.position.x;
+				oldY = camera.position.y;
+				oldZ = camera.position.z;
 			}
 
 		</script>
