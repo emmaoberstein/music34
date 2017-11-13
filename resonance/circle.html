@@ -106,7 +106,7 @@
 				}
 
 				// Create <audio> streaming audio source.
-				var audioContext = new (window.AudioContext || window.webkitAudioContext);
+				var audioContext = new AudioContext();
 
 			  // Create gain nodes.
 			  var gain = audioContext.createGain();
