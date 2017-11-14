@@ -70,7 +70,7 @@
 			}
 
 			let pitch = getParameterByName('Pitch');
-			if (pitch == null) {
+			if (pitch == null || parseInt(pitch) > 5 || parseInt(pitch) < -5) {
 				pitch = "0";
 			}
 

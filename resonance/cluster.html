@@ -64,7 +64,7 @@
 			}
 
 			let pitch = getParameterByName('Pitch');
-			if (pitch == null) {
+			if (pitch == null || parseInt(pitch) > 5 || parseInt(pitch) < -5) {
 				pitch = "0";
 			}
 
@@ -205,7 +205,7 @@
 							}	else {
 								offsets[i] = Math.random() * offset
 							}
-							
+
 							document.getElementById(i.toString()).addEventListener("ended", function() {
 	        			var id = this.id
 								var delay = setTimeout(function(){
