@@ -129,6 +129,27 @@
 			</div>
 		</div>
 
+		<div class="row ambisonics">
+			<div class="col-md-offset-3 col-md-3">
+				Offset Type:
+			</div>
+			<div class="col-md-3">
+				<select id="offsettype">
+					<option value="uniform">uniform</option>
+					<option value="maximum">maximum</option>
+		  	</select>
+			</div>
+		</div>
+
+		<div class="row ambisonics">
+			<div class="col-md-offset-3 col-md-3">
+				Offset:
+			</div>
+			<div class="col-md-3">
+  			<input id="offset" type="number" min="0" max="10000" value=0>
+			</div>
+		</div>
+
 		<div class="row">
 			<div class="col-md-offset-3 col-md-3">
 				X:
@@ -235,6 +256,10 @@
 				url += '?Order=' + order;
 				var pitch = $("#pitch").val()
 				url += '?Pitch=' + pitch;
+				var offset = $("#offset").val()
+				url += '?Offset=' + offset;
+				var offsettype = $("#offsettype").val()
+				url += '?OffsetType=' + offsettype;
 			} else {
 				var size = $("#size").val()
 				url += '?Size=' + size

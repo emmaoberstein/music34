@@ -13,6 +13,8 @@
 			}
 		</style>
 	</head>
+		<div id="audio">
+		</div>
 	<body>
 
 		<script src="https://cdn.jsdelivr.net/npm/resonance-audio/build/resonance-audio.min.js"></script>
@@ -47,11 +49,6 @@
 				Z = 600;
 			}
 
-			let boxSize = parseInt(getParameterByName('Size'));
-			if (isNaN(boxSize)) {
-				boxSize = 20;
-			}
-
 			let numObjects = parseInt(getParameterByName('NumObjects'));
 			if (isNaN(numObjects)) {
 				numObjects = 10;
@@ -76,6 +73,18 @@
 			if (pitch == null) {
 				pitch = "0";
 			}
+
+			let offsetType = getParameterByName('OffsetType');
+			if (offsetType == null) {
+				offsetType = "uniform";
+			}
+
+			let offset = parseInt(getParameterByName('Offset'));
+			if (offset == null) {
+				offset = 100;
+			}
+
+			let boxSize = 50 + parseInt(pitch) * 7.5;
 
 			init();
 			animate();
@@ -141,6 +150,7 @@
 				};
 
 				audioScene.setRoomProperties(roomDimensions, roomMaterials);
+				var offsets = new Array(numObjects)
 
 				var theta = ((Math.PI*2) / numObjects);
 				for (var i = 1; i <= numObjects; i++) {
@@ -178,19 +188,28 @@
 						audioScene.output.connect(gain);
 						gain.connect(audioContext.destination);
 
-						let audioSource = 'https://emmaoberstein.github.io/music34/media/' + material + "_" + pitch + '.wav';
-						let audioElement = document.createElement('audio');
+						var audioSource = 'https://emmaoberstein.github.io/music34/media/' + material + "_" + pitch + '.wav';
+						var audioElement = document.createElement('audio');
 						audioElement.src = audioSource;
 						audioElement.crossOrigin = "anonymous";
+						audioElement.id = i.toString()
 						audioElement.load();
-						audioElement.onended = function(){
-							this.currentTime = 0;
-							var delay = setTimeout(function(){
-								audioElement.play();
-								clearTimeout(delay);
-								console.log("playing")
-							}, Math.random() * 100);
+
+						document.getElementById("audio").appendChild(audioElement)
+
+						if (offsetType == "uniform") {
+							offsets[i] = i * offset
+						}	else {
+							offsets[i] = Math.random() * offset
 						}
+						
+						document.getElementById(i.toString()).addEventListener("ended", function() {
+        			var id = this.id
+							var delay = setTimeout(function(){
+								document.getElementById(id).play();
+								clearTimeout(delay);
+							}, offsets[id]);
+    				});
 
 						audioElementSource = audioContext.createMediaElementSource(audioElement);
 						audioElementSource.connect(source.input);
